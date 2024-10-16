@@ -1,0 +1,89 @@
+import java.text.SimpleDateFormat
+import java.time.Year
+
+plugins {
+    id 'java'
+    id 'com.diffplug.spotless' version '6.24.0'
+}
+
+group 'ie.francis'
+version '0.0.1-alpha'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.ow2.asm', name: 'asm', version: '9.5'
+    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '9.5'
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.9.0'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+                'Main-Class': 'ie.francis.pg.Main'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+compileJava {
+    doFirst {
+        File f = new File("${project.layout.buildDirectory.get()}/generated-src/main/java/ie/francis/pg/Version.java")
+        f.text = f.text.replace("@VERSION_STRING@", "$version (${gitBranch()}, ${new SimpleDateFormat("dd MMM yyyy, HH:mm:ss").format(new Date())})")
+    }
+    doFirst {
+        copy {
+            from "src/main/java/ie/francis/pg/Version.java.tmpl"
+            into "${project.layout.buildDirectory.get()}/generated-src/main/java/ie/francis/pg"
+            rename("Version.java.tmpl", "Version.java")
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'build/generated-src/main/java']
+        }
+    }
+}
+
+spotless {
+    String header = """/*
+ * (c) ${Year.now().getValue()} Francis McNamee
+ * */
+ 
+"""
+
+    java {
+        ratchetFrom 'origin/main'
+        googleJavaFormat()
+        licenseHeader header
+        target 'src/main/java/**/*.java'
+    }
+
+    // This avoids failing every gradle build if spotlessApply hasn't been ran yet
+    enforceCheck false
+}
