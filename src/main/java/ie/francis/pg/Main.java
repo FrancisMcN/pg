@@ -4,47 +4,45 @@
  
 package ie.francis.pg;
 
-import ie.francis.pg.node.*;
+import ie.francis.pg.printer.JavaPrinter;
+import ie.francis.pg.term.*;
 
 public class Main {
   public static void main(String[] args) {
-    GrammarNode grammar =
-        new GrammarNode()
-            .setCode(
-                "private Stack<Object> stack;\n\npublic Parser() { this.stack = new Stack<>(); }")
-            .addNode(
-                new NonTerminalNode("expr")
-                    .addNodeToBody(
-                        new PlusNode()
-                            .addNode(
-                                new TerminalNode("Symbol")
-                                    .setCode("System.out.println(\"hello world\");"))))
-            .addNode(
-                new NonTerminalNode("optional")
-                    .addNodeToBody(
-                        new OptionalNode()
-                            .addNode(
-                                new TerminalNode("Boolean")
-                                    .setCode("System.out.println(\"hello world\");"))
-                            .addNode(
-                                new TerminalNode("Float")
-                                    .setCode("System.out.println(\"hello world\");")))
-                    .addNodeToBody(
-                        new OptionalNode()
-                            .addNode(
-                                new TerminalNode("Quote")
-                                    .setCode("System.out.println(\"hello world\");"))))
-            .addNode(
-                new NonTerminalNode("list")
-                    .addNodeToBody(
-                        new StarNode()
-                            .addNode(
-                                new TerminalNode("Number")
-                                    .setCode("System.out.println(\"hello world\");"))
-                            .addNode(
-                                new TerminalNode("String")
-                                    .setCode("System.out.println(\"hello world\");"))));
 
-    System.out.println(grammar.print(0));
+    NonTerminal program = new NonTerminal("program");
+    NonTerminal expr = new NonTerminal("expr");
+    NonTerminal list = new NonTerminal("list");
+    NonTerminal atom = new NonTerminal("atom");
+
+    Production programProduction = new Production(program).addTerm(new Star().addTerm(expr));
+
+    Production exprProduction1 = new Production(expr).addTerm(list);
+    Production exprProduction2 = new Production(expr).addTerm(atom);
+    Production exprProduction3 = new Production(expr).addTerm(new Terminal("QUOTE")).addTerm(expr);
+
+    Production listProduction =
+        new Production(list)
+            .addTerm(new Terminal("LPAREN"))
+            .addTerm(new Star().addTerm(expr))
+            .addTerm(new Terminal("RPAREN"));
+
+    Production atomProduction1 = new Production(atom).addTerm(new Terminal("SYMBOL"));
+    Production atomProduction2 = new Production(atom).addTerm(new Terminal("NUMBER"));
+    Production atomProduction3 = new Production(atom).addTerm(new Terminal("BOOLEAN"));
+    Production atomProduction4 = new Production(atom).addTerm(new Terminal("STRING"));
+
+    System.out.println(
+        new JavaPrinter(
+                programProduction,
+                exprProduction1,
+                exprProduction2,
+                exprProduction3,
+                listProduction,
+                atomProduction1,
+                atomProduction2,
+                atomProduction3,
+                atomProduction4)
+            .print());
   }
 }
