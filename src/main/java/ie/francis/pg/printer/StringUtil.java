@@ -2,7 +2,7 @@
  * (c) 2024 Francis McNamee
  * */
  
-package ie.francis.pg;
+package ie.francis.pg.printer;
 
 public class StringUtil {
 
@@ -10,12 +10,16 @@ public class StringUtil {
     return name.substring(0, 1).toUpperCase() + name.substring(1);
   }
 
-  public static String indent(int count) {
+  public static String indent(int count, char character) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < count; i++) {
-      sb.append("\t");
+      sb.append(character);
     }
     return sb.toString();
+  }
+
+  public static String indent(int count) {
+    return indent(count, '\t');
   }
 
   public static String indentLines(String code, int depth) {
