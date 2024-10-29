@@ -32,34 +32,75 @@ public class BasePrinter {
     this.cp = new StringBuilder();
   }
 
-  public Set<Term> follow(NonTerminal nt) {
-    Set<Term> followSet = new HashSet<>();
+  public Set<String> predict(Production production) {
+    Set<String> predict = first(production);
 
-    //        for (NonTerminal nonTerminal : this.nonTerminals) {
-    //            for (Production production : nonTerminal.productions()) {
-    //                List<Term> tempTerms = new ArrayList<>();
-    //                for (Term term : production.terms()) {
-    //                    tempTerms.add(term);
-    //                }
-    //                for (int i = 0; i < production.terms().size(); i++) {
-    //                    List<Term> terms = tempTerms;
-    //                    Term term = terms.get(i);
-    //                    if (term instanceof Modifier) {
-    //                        terms.remove(i);
-    //                        terms.addAll(i, ((Modifier)term).expand());
-    //                    }
-    //                    if (terms.get(i) == nt && i + 1 < terms.size()) {
-    //                        followSet.addAll(terms.get(i + 1).first());
-    //                    }
-    //                    else if (terms.get(i) == nt && i + 1 >= terms.size()) {
-    //                        if (nt != nonTerminal) {
-    //                            followSet.addAll(follow(nonTerminal));
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
+    // If non-terminal (X) can become empty string, then
+    // predict(X) = first(X) U follow(X)
+    if (canBecomeEpsilon(production.nonTerminal())) {
+      predict.addAll(follow(production.nonTerminal()));
+    }
 
+    return predict;
+  }
+
+  public Set<String> predict(NonTerminal nonTerminal) {
+
+    Set<String> predict = new HashSet<>();
+
+    List<Production> productions = this.productions.get(nonTerminal);
+    for (Production production : productions) {
+      predict.addAll(predict(production));
+    }
+
+    return predict;
+  }
+
+  public boolean canBecomeEpsilon(NonTerminal nonTerminal) {
+    Set<NonTerminal> eps = new HashSet<>();
+    List<Production> productionList = productions.get(nonTerminal);
+    for (Production production : productionList) {
+      if (production.terms().size() == 1) {
+        if (production.terms().get(0).toString().equals("Ɛ")) {
+          eps.add(nonTerminal);
+        }
+      }
+    }
+    return eps.contains(nonTerminal);
+  }
+
+  public Set<String> follow(NonTerminal nonTerminal) {
+    Set<String> followSet = new HashSet<>();
+
+    for (Map.Entry<NonTerminal, List<Production>> entry : productions.entrySet()) {
+
+      List<Production> productionList = entry.getValue();
+      for (Production production : productionList) {
+        List<Term> terms = production.terms();
+        List<Term> expanded = new ArrayList<>();
+        for (Term term : terms) {
+          expanded.addAll(term.expand());
+        }
+        for (int i = 0; i < expanded.size(); i++) {
+          if (expanded.get(i) == nonTerminal) {
+            if (i + 1 < expanded.size()) {
+              Term following = expanded.get(i + 1);
+              if (following instanceof NonTerminal) {
+                // Add first(X) when X is a non-terminal and follows nonTerminal
+                followSet.addAll(first((NonTerminal) following));
+              } else {
+                // Add X when X is a terminal and follows nonTerminal
+                followSet.add(following.toString());
+              }
+            } else if (nonTerminal != production.nonTerminal()) {
+              // Add follow(X) when X is a non-terminal is the right-most term in a production
+              // for nonTerminal
+              followSet.addAll(follow(production.nonTerminal()));
+            }
+          }
+        }
+      }
+    }
     return followSet;
   }
 

@@ -31,6 +31,7 @@ public class Main {
     Production atomProduction2 = new Production(atom).addTerm(new Terminal("NUMBER"));
     Production atomProduction3 = new Production(atom).addTerm(new Terminal("BOOLEAN"));
     Production atomProduction4 = new Production(atom).addTerm(new Terminal("STRING"));
+    Production atomProduction5 = new Production(atom).addTerm(new Terminal("Ɛ"));
 
     System.out.println(
         new JavaPrinter(
@@ -42,7 +43,8 @@ public class Main {
                 atomProduction1,
                 atomProduction2,
                 atomProduction3,
-                atomProduction4)
+                atomProduction4,
+                atomProduction5)
             .print());
   }
 }
