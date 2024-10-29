@@ -31,6 +31,10 @@ public class Star implements Term {
     return first;
   }
 
+  public List<Term> terms() {
+    return terms;
+  }
+
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
