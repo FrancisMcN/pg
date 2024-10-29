@@ -65,37 +65,48 @@ public class JavaPrinter extends BasePrinter implements Printer {
       cp.append(
           String.format("%sprivate void %s() {\n\n", StringUtil.indent(depth), nonTerminal.name()));
       StringBuilder ifBuilder = new StringBuilder();
-      depth++;
-      cp.append(String.format("%s", StringUtil.indent(depth)));
-      for (int i = 0; i < productions.size(); i++) {
-        StringBuilder ifConditionBuilder = new StringBuilder();
-        List<String> first = new ArrayList<>(predict(productions.get(i)));
-        for (int j = 0; j < first.size(); j++) {
-          if (!first.get(j).equals("Ɛ")) {
-            ifConditionBuilder.append(String.format("nextTokenIs(%s)", first.get(j)));
-            if (j + 1 < first.size()) {
-              ifConditionBuilder.append(" || ");
-            }
-          }
-        }
 
-        ifBuilder.append(String.format("if (%s) {\n", ifConditionBuilder));
-
-        List<Term> terms = productions.get(i).terms();
+      if (productions.size() == 1) {
+        List<Term> terms = productions.get(0).terms();
         for (Term term : terms) {
           depth++;
-          ifBuilder.append(String.format("%s\n", print(term)));
+          cp.append(String.format("%s\n", print(term)));
           depth--;
         }
+      } else {
+        depth++;
+        cp.append(String.format("%s", StringUtil.indent(depth)));
+        for (int i = 0; i < productions.size(); i++) {
+          StringBuilder ifConditionBuilder = new StringBuilder();
+          List<String> first = new ArrayList<>(predict(productions.get(i)));
+          for (int j = 0; j < first.size(); j++) {
+            if (!first.get(j).equals("Ɛ")) {
+              ifConditionBuilder.append(String.format("nextTokenIs(%s)", first.get(j)));
+              if (j + 1 < first.size()) {
+                ifConditionBuilder.append(" || ");
+              }
+            }
+          }
 
-        if (i + 1 < productions.size()) {
-          ifBuilder.append(String.format("%s} else ", StringUtil.indent(depth)));
-        } else {
-          ifBuilder.append(String.format("%s}\n\n", StringUtil.indent(depth)));
+          ifBuilder.append(String.format("if (%s) {\n", ifConditionBuilder));
+
+          List<Term> terms = productions.get(i).terms();
+          for (Term term : terms) {
+            depth++;
+            ifBuilder.append(String.format("%s\n", print(term)));
+            depth--;
+          }
+
+          if (i + 1 < productions.size()) {
+            ifBuilder.append(String.format("%s} else ", StringUtil.indent(depth)));
+          } else {
+            ifBuilder.append(String.format("%s}\n\n", StringUtil.indent(depth)));
+          }
         }
+        depth--;
+
+        cp.append(ifBuilder);
       }
-      depth--;
-      cp.append(ifBuilder);
       cp.append(String.format("%s}\n\n", StringUtil.indent(depth)));
     }
 
