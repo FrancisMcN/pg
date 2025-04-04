@@ -1,50 +1,75 @@
 /*
- * (c) 2024 Francis McNamee
+ * (c) 2025 Francis McNamee
  * */
  
 package ie.francis.pg;
 
-import ie.francis.pg.printer.JavaPrinter;
-import ie.francis.pg.term.*;
-
 public class Main {
+
   public static void main(String[] args) {
+
+    Grammar grammar = new Grammar();
 
     NonTerminal program = new NonTerminal("program");
     NonTerminal expr = new NonTerminal("expr");
     NonTerminal list = new NonTerminal("list");
     NonTerminal atom = new NonTerminal("atom");
 
-    Production programProduction = new Production(program).addTerm(new Star().addTerm(expr));
+    Terminal epsilon = new Terminal("ε");
 
-    Production exprProduction1 = new Production(expr).addTerm(list);
-    Production exprProduction2 = new Production(expr).addTerm(atom);
-    Production exprProduction3 = new Production(expr).addTerm(new Terminal("QUOTE")).addTerm(expr);
+    grammar.addProduction(program, new Rule().addTerm(expr));
 
-    Production listProduction =
-        new Production(list)
-            .addTerm(new Terminal("LPAREN"))
-            .addTerm(new Star().addTerm(expr))
-            .addTerm(new Terminal("RPAREN"));
+    grammar
+        .addProduction(expr, new Rule().addTerm(list))
+        .addProduction(expr, new Rule().addTerm(atom))
+        .addProduction(expr, new Rule().addTerm(epsilon));
 
-    Production atomProduction1 = new Production(atom).addTerm(new Terminal("SYMBOL"));
-    Production atomProduction2 = new Production(atom).addTerm(new Terminal("NUMBER"));
-    Production atomProduction3 = new Production(atom).addTerm(new Terminal("BOOLEAN"));
-    Production atomProduction4 = new Production(atom).addTerm(new Terminal("STRING"));
-    Production atomProduction5 = new Production(atom).addTerm(new Terminal("Ɛ"));
+    grammar.addProduction(list, new Rule().addTerm("(").addTerm(expr).addTerm(")"));
 
-    System.out.println(
-        new JavaPrinter(
-                programProduction,
-                exprProduction1,
-                exprProduction2,
-                exprProduction3,
-                listProduction,
-                atomProduction1,
-                atomProduction2,
-                atomProduction3,
-                atomProduction4,
-                atomProduction5)
-            .print());
+    grammar
+        .addProduction(atom, new Rule().addTerm("SYMBOL"))
+        .addProduction(atom, new Rule().addTerm("STRING"))
+        .addProduction(atom, new Rule().addTerm("INT"))
+        .addProduction(atom, new Rule().addTerm("BOOL"));
+
+    grammar.generate();
+    JavaPrinter p = new JavaPrinter(grammar);
+    System.out.println(p.print());
+
+    //        Generator generator = new Generator();
+    //        generator.addProduction("program", "expr");
+    //        generator.addProduction("expr", "list", "atom", "EPSILON");
+    //        generator.addProduction("list", "( list )");
+    //        generator.addProduction("atom", "SYMBOL", "INT", "STR", "BOOL");
+    //
+    //        System.out.println("--- eps ---");
+    //        System.out.println(generator.eps());
+    //
+    //        System.out.println("--- first ---");
+    //        Map<String, Set<String>> first = generator.first();
+    //        for (Map.Entry<String, Set<String>> rule : first.entrySet()) {
+    //            if (rule.getKey().matches("[A-Z]+")) {
+    //                System.out.println(rule.getKey() + " " + rule.getValue());
+    //            }
+    //        }
+    //
+    //        System.out.println("--- follow ---");
+    //        Map<String, Set<String>> follow = generator.follow();
+    //        for (Map.Entry<String, Set<String>> rule : follow.entrySet()) {
+    //            System.out.println(rule.getKey() + " " + rule.getValue());
+    //        }
+    //
+    //        System.out.println("--- predict ---");
+    //        Map<String, List<Set<String>>> predict = generator.predict();
+    //        for (Map.Entry<String, List<Set<String>>> rules : predict.entrySet()) {
+    //            for (Set<String> rule : rules.getValue()) {
+    //                System.out.println(rules.getKey() + " " + rule);
+    //            }
+    //        }
+    //
+    //        System.out.println("--- generated java parser ---");
+    //        JavaPrinter printer = new JavaPrinter(generator);
+    //        System.out.println(printer.print());
+
   }
 }

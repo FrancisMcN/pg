@@ -1,8 +1,8 @@
 /*
- * (c) 2024 Francis McNamee
+ * (c) 2025 Francis McNamee
  * */
  
-package ie.francis.pg.term;
+package ie.francis.pgold.term;
 
 import java.util.ArrayList;
 import java.util.HashSet;

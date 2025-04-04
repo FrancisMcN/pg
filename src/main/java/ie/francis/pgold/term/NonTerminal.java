@@ -1,24 +1,20 @@
 /*
- * (c) 2024 Francis McNamee
+ * (c) 2025 Francis McNamee
  * */
  
-package ie.francis.pg.term;
+package ie.francis.pgold.term;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Terminal implements Term {
+public class NonTerminal implements Term {
 
-  private final String value;
+  private final String name;
 
-  public Terminal(String name) {
-    this.value = name;
-  }
-
-  public String value() {
-    return value;
+  public NonTerminal(String name) {
+    this.name = name;
   }
 
   @Override
@@ -28,13 +24,17 @@ public class Terminal implements Term {
     return terms;
   }
 
-  @Override
+  //    @Override
   public Set<Term> first() {
-    return new HashSet<>(List.of(this));
+    return new HashSet<>();
+  }
+
+  public String name() {
+    return name;
   }
 
   @Override
   public String toString() {
-    return String.format("%s", value);
+    return this.name;
   }
 }
