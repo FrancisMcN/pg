@@ -1,8 +1,8 @@
 /*
- * (c) 2024 Francis McNamee
+ * (c) 2025 Francis McNamee
  * */
  
-package ie.francis.pg.printer;
+package ie.francis.pg;
 
 public class StringUtil {
 
@@ -30,5 +30,13 @@ public class StringUtil {
       lines.append("\n");
     }
     return lines.toString();
+  }
+
+  public static boolean isTerminal(String term) {
+    return term.equals(term.toUpperCase());
+  }
+
+  public static boolean isNonTerminal(String term) {
+    return term.matches("[a-z]+");
   }
 }

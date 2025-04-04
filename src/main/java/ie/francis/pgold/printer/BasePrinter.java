@@ -1,12 +1,12 @@
 /*
- * (c) 2024 Francis McNamee
+ * (c) 2025 Francis McNamee
  * */
  
-package ie.francis.pg.printer;
+package ie.francis.pgold.printer;
 
-import ie.francis.pg.Production;
-import ie.francis.pg.term.NonTerminal;
-import ie.francis.pg.term.Term;
+import ie.francis.pgold.Production;
+import ie.francis.pgold.term.NonTerminal;
+import ie.francis.pgold.term.Term;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

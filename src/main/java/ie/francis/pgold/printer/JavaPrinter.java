@@ -1,17 +1,17 @@
 /*
- * (c) 2024 Francis McNamee
+ * (c) 2025 Francis McNamee
  * */
  
-package ie.francis.pg.printer;
+package ie.francis.pgold.printer;
 
-import ie.francis.pg.Production;
-import ie.francis.pg.Version;
-import ie.francis.pg.term.NonTerminal;
-import ie.francis.pg.term.Optional;
-import ie.francis.pg.term.Plus;
-import ie.francis.pg.term.Star;
-import ie.francis.pg.term.Term;
-import ie.francis.pg.term.Terminal;
+import ie.francis.pgold.Production;
+import ie.francis.pgold.Version;
+import ie.francis.pgold.term.NonTerminal;
+import ie.francis.pgold.term.Optional;
+import ie.francis.pgold.term.Plus;
+import ie.francis.pgold.term.Star;
+import ie.francis.pgold.term.Term;
+import ie.francis.pgold.term.Terminal;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
